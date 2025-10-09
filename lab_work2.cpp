@@ -1,20 +1,31 @@
 #include "lab_work2.h"
 
 
+
 void task1_3() {
     std::vector<int> v;
     int n, value;
     
     std::cout << "Введите количество элементов первого массива " << std::endl;
     std::cin >> n;
+    if(std::cin.fail() || n <= 0){
+        std::cout << "Ошибка ввода" << std::endl;
+        return;
+    }
+    
     if(n % 2 == 0) {
         std::cout << "Введите " << n << " элементов: ";
         for(int i = 0; i < n; i++) {
             std::cin >> value;
+            if(std::cin.fail()){
+                std::cout << "Ошибка ввода" << std::endl;
+                return;
+            }
             v.push_back(value);
         }
     }else{
         std::cout << "Элементов в массиве должно быть четное количество " << std::endl;
+        return;
     }
     
 
@@ -32,7 +43,6 @@ void task1_3() {
     std::cout << std::endl;
 }
 
-
 void task2_4() {
     std::vector<int> v;
     std::list<int> l;
@@ -40,26 +50,46 @@ void task2_4() {
     
     std::cout << "Введите количество элементов для вектора: " << std::endl;
     std::cin >> n1;
+    if(std::cin.fail() || n1 <= 0){
+        std::cout << "Ошибка ввода" << std::endl;
+        return;
+    }
+    
     if(n1 >= 5) {
         std::cout << "Введите " << n1 << " элементов для вектора: ";
         for(int i = 0; i < n1; i++) {
             std::cin >> value;
+            if(std::cin.fail()){
+                std::cout << "Ошибка ввода" << std::endl;
+                return;
+            }
             v.push_back(value);
         }
     }else{
         std::cout << "В векторе должно быть не менее 5 элементов " << std::endl;
+        return;
     }
         
     std::cout << "Введите количество элементов для списка: " << std::endl;
     std::cin >> n2;
+    if(std::cin.fail() || n2 <= 0){
+        std::cout << "Ошибка ввода" << std::endl;
+        return;
+    }
+    
     if(n2 >= 5) {
         std::cout << "Введите " << n2 << " элементов для списка: ";
         for(int i = 0; i < n2; i++) {
             std::cin >> value;
+            if(std::cin.fail()){
+                std::cout << "Ошибка ввода" << std::endl;
+                return;
+            }
             l.push_back(value);
         }
     }else{
         std::cout << "В списке должно быть не менее 5 элементов " << std::endl;
+        return;
     }
 
     std::vector<int>::reverse_iterator iter_vector = v.rbegin();
@@ -78,33 +108,52 @@ void task2_4() {
     
 }
 
-
 void task3_7() {
     std::list<int> l1, l2;
     int n, n1, value;
 
     std::cout << "Введите количество элементов для первого списка ";
     std::cin >> n;
+    if(std::cin.fail() || n <= 0){
+        std::cout << "Ошибка ввода" << std::endl;
+        return;
+    }
+    
     if(n%2 == 0){
         std::cout << "Введите " << n << " элементов для первого списка: ";
         for(int i = 0; i < n; i++) {
             std::cin >> value;
+            if(std::cin.fail()){
+                std::cout << "Ошибка ввода" << std::endl;
+                return;
+            }
             l1.push_back(value);
         }
     }else{
         std::cout << "В списке должно быть четное количество элементов " << std::endl;
+        return;
     }
 
     std::cout << "Введите количество элементов для второго списка ";
     std::cin >> n1;
+    if(std::cin.fail() || n1 <= 0){
+        std::cout << "Ошибка ввода" << std::endl;
+        return;
+    }
+    
     if(n1%2 == 0){
         std::cout << "Введите " << n1 << " элементов для второго списка: ";
         for(int i = 0; i < n1; i++) {
             std::cin >> value;
+            if(std::cin.fail()){
+                std::cout << "Ошибка ввода" << std::endl;
+                return;
+            }
             l2.push_back(value);
         }
     }else{
         std::cout << "В списке должно быть четное количество элементов " << std::endl;
+        return;
     }
 
     int count_l2_half_elem = 0;
@@ -129,7 +178,6 @@ void task3_7() {
     }
     l2.splice(l2.end(), l1, iter_l1, iter_l1_second);
 
-
     for(iter_l1 = l1.begin(); iter_l1 != l1.end(); iter_l1++) {
         std::cout << *iter_l1 << " ";
     }
@@ -141,11 +189,14 @@ void task3_7() {
     std::cout << std::endl;
 }
 
-
 void task4_1() {
     int k;
     std::cout << "Введите  К, которое будет служить ограничением по длине слов" << std::endl;
     std::cin >> k;
+    if(std::cin.fail() || k <= 0){
+        std::cout << "Ошибка ввода" << std::endl;
+        return;
+    }
 
     std::ifstream input("name1.txt");
     std::ofstream output("name2.txt");
@@ -160,17 +211,24 @@ void task4_1() {
     );
 }
 
-
 void task5_2() {
     std::deque<int> d;
     int n, value;
     
     std::cout << "Введите количество элементов для дека: ";
     std::cin >> n;
+    if(std::cin.fail() || n <= 0){
+        std::cout << "Ошибка ввода" << std::endl;
+        return;
+    }
     
     std::cout << "Введите " << n << " элементов: ";
     for(int i = 0; i < n; i++) {
         std::cin >> value;
+        if(std::cin.fail()){
+            std::cout << "Ошибка ввода" << std::endl;
+            return;
+        }
         d.push_back(value);
     }
 
@@ -192,17 +250,24 @@ void task5_2() {
     std::cout << std::endl;
 }
 
-
 void task8_1() {
     std::list<int> l;
     int n, value;
     
     std::cout << "Введите количество элементов для списка: ";
     std::cin >> n;
+    if(std::cin.fail() || n <= 0){
+        std::cout << "Ошибка ввода" << std::endl;
+        return;
+    }
     
     std::cout << "Введите " << n << " элементов: ";
     for(int i = 0; i < n; i++) {
         std::cin >> value;
+        if(std::cin.fail()){
+            std::cout << "Ошибка ввода" << std::endl;
+            return;
+        }
         l.push_back(value);
     }
 
@@ -224,7 +289,6 @@ void task8_1() {
     std::cout << std::endl;
 }
 
-
 void task9_1() {
     std::srand(std::time(0));
     int k, n, value;
@@ -233,16 +297,27 @@ void task9_1() {
     
     std::cout << "Введите количество элементов для вектора v0: ";
     std::cin >> n;
+    if(std::cin.fail() || n <= 0){
+        std::cout << "Ошибка ввода" << std::endl;
+        return;
+    }
     
     std::cout << "Введите " << n << " элементов: ";
     for(int i = 0; i < n; i++) {
         std::cin >> value;
+        if(std::cin.fail()){
+            std::cout << "Ошибка ввода" << std::endl;
+            return;
+        }
         v0.push_back(value);
     }
 
-
-    std::cout << "Введите сколько векторов создать, вектора будут случайной длины от 5 до 10 и со случайчными элементами" << std::endl;
+    std::cout << "Введите сколько векторов создать, вектора будут случайной длины от 5 до 10 и со случайными элементами" << std::endl;
     std::cin >> k;
+    if(std::cin.fail() || k <= 0){
+        std::cout << "Ошибка ввода" << std::endl;
+        return;
+    }
 
     std::vector<std::vector<int>> vi;
 
@@ -276,7 +351,6 @@ void task9_1() {
     std::cout << "Векторов с совпадающим содержимым - " << count << std::endl;
 }
 
-
 void task10_2() {
     std::vector<std::string> v;
     int n;
@@ -284,13 +358,16 @@ void task10_2() {
     
     std::cout << "Введите какое количество английских слов будет введено: ";
     std::cin >> n;
+    if(std::cin.fail() || n <= 0){
+        std::cout << "Ошибка ввода" << std::endl;
+        return;
+    }
     
     std::cout << "Введите " << n << " слов: ";
     for(int i = 0; i < n; i++) {
         std::cin >> word;
         v.push_back(word);
     }
-
 
     std::map<char, int> m;
 
@@ -301,7 +378,6 @@ void task10_2() {
     for(std::map<char, int>::iterator iter = m.begin(); iter != m.end(); iter++) {
         std::cout << iter->first << iter->second << std::endl;
     }
-
 }
 
 
