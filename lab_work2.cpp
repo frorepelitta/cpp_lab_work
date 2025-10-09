@@ -1,23 +1,22 @@
-#include <iostream>
-#include <vector>
-#include <list>
-#include <fstream>
-#include <algorithm>
-#include <string>
-#include <iterator>
-#include <deque>
-#include <numeric>
-#include <cstdlib>
-#include <ctime>
-#include <set>
-#include <map>
+#include "lab_work2.h"
 
 
 void task1_3() {
-    bool flag = false;
-    int numbers[10] {0, 1, 2, 3, 4, -5, -6, -7, -8, -9};
-
-    std::vector<int> v(numbers, numbers + sizeof(numbers) / sizeof(numbers[0]));
+    std::vector<int> v;
+    int n, value;
+    
+    std::cout << "Введите количество элементов первого массива " << std::endl;
+    std::cin >> n;
+    if(n % 2 == 0) {
+        std::cout << "Введите " << n << " элементов: ";
+        for(int i = 0; i < n; i++) {
+            std::cin >> value;
+            v.push_back(value);
+        }
+    }else{
+        std::cout << "Элементов в массиве должно быть четное количество " << std::endl;
+    }
+    
 
     std::vector<int>::iterator iter = v.begin();
     std::vector<int>::iterator mid = v.begin() + v.size()/2;
@@ -35,11 +34,33 @@ void task1_3() {
 
 
 void task2_4() {
-    int numbers[10] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    int digits[10] {10, 100, 200, 300, 400, 500, 600, 700, 800, 900};
-
-    std::vector<int> v(std::begin(numbers), std::end(numbers));
-    std::list<int> l(std::begin(digits), std::end(digits));
+    std::vector<int> v;
+    std::list<int> l;
+    int n1, n2, value;
+    
+    std::cout << "Введите количество элементов для вектора: " << std::endl;
+    std::cin >> n1;
+    if(n1 >= 5) {
+        std::cout << "Введите " << n1 << " элементов для вектора: ";
+        for(int i = 0; i < n1; i++) {
+            std::cin >> value;
+            v.push_back(value);
+        }
+    }else{
+        std::cout << "В векторе должно быть не менее 5 элементов " << std::endl;
+    }
+        
+    std::cout << "Введите количество элементов для списка: " << std::endl;
+    std::cin >> n2;
+    if(n2 >= 5) {
+        std::cout << "Введите " << n2 << " элементов для списка: ";
+        for(int i = 0; i < n2; i++) {
+            std::cin >> value;
+            l.push_back(value);
+        }
+    }else{
+        std::cout << "В списке должно быть не менее 5 элементов " << std::endl;
+    }
 
     std::vector<int>::reverse_iterator iter_vector = v.rbegin();
     std::list<int>::iterator iter_list = l.begin();
@@ -59,10 +80,33 @@ void task2_4() {
 
 
 void task3_7() {
+    std::list<int> l1, l2;
+    int n, n1, value;
 
-    int numbers[10] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::list<int> l1(std::begin(numbers), std::end(numbers));
-    std::list<int> l2(std::begin(numbers), std::end(numbers));
+    std::cout << "Введите количество элементов для первого списка ";
+    std::cin >> n;
+    if(n%2 == 0){
+        std::cout << "Введите " << n << " элементов для первого списка: ";
+        for(int i = 0; i < n; i++) {
+            std::cin >> value;
+            l1.push_back(value);
+        }
+    }else{
+        std::cout << "В списке должно быть четное количество элементов " << std::endl;
+    }
+
+    std::cout << "Введите количество элементов для второго списка ";
+    std::cin >> n1;
+    if(n1%2 == 0){
+        std::cout << "Введите " << n1 << " элементов для второго списка: ";
+        for(int i = 0; i < n1; i++) {
+            std::cin >> value;
+            l2.push_back(value);
+        }
+    }else{
+        std::cout << "В списке должно быть четное количество элементов " << std::endl;
+    }
+
     int count_l2_half_elem = 0;
     std::list<int>::iterator iter_l1 = l1.begin();
     std::list<int>::iterator iter_l2 = l2.begin();
@@ -118,13 +162,21 @@ void task4_1() {
 
 
 void task5_2() {
-
-    int numbers[10] {1, 2, 3, 4, 5, 6, 0, 7, 8, 9};    
-    std::deque<int> d(std::begin(numbers), std::end(numbers));
+    std::deque<int> d;
+    int n, value;
+    
+    std::cout << "Введите количество элементов для дека: ";
+    std::cin >> n;
+    
+    std::cout << "Введите " << n << " элементов: ";
+    for(int i = 0; i < n; i++) {
+        std::cin >> value;
+        d.push_back(value);
+    }
 
     std::deque<int>::reverse_iterator find_iter = std::find(d.rbegin(), d.rend(), 0);
     
-    if(*find_iter == 0){
+    if(find_iter != d.rend()){
         std::deque<int>::iterator iter = find_iter.base();
         iter--;
         d.erase(iter);
@@ -142,7 +194,18 @@ void task5_2() {
 
 
 void task8_1() {
-    std::list<int> l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::list<int> l;
+    int n, value;
+    
+    std::cout << "Введите количество элементов для списка: ";
+    std::cin >> n;
+    
+    std::cout << "Введите " << n << " элементов: ";
+    for(int i = 0; i < n; i++) {
+        std::cin >> value;
+        l.push_back(value);
+    }
+
     std::vector<double> v;
     
     struct Average {
@@ -164,9 +227,19 @@ void task8_1() {
 
 void task9_1() {
     std::srand(std::time(0));
-    int k;
+    int k, n, value;
 
-    std::vector<int> v0{1, 2, 3};
+    std::vector<int> v0;
+    
+    std::cout << "Введите количество элементов для вектора v0: ";
+    std::cin >> n;
+    
+    std::cout << "Введите " << n << " элементов: ";
+    for(int i = 0; i < n; i++) {
+        std::cin >> value;
+        v0.push_back(value);
+    }
+
 
     std::cout << "Введите сколько векторов создать, вектора будут случайной длины от 5 до 10 и со случайчными элементами" << std::endl;
     std::cin >> k;
@@ -205,7 +278,19 @@ void task9_1() {
 
 
 void task10_2() {
-    std::vector<std::string> v{"APPLE", "FUN", "CAT", "ALPHABET", "ARRAY", "FOREHEAD"};
+    std::vector<std::string> v;
+    int n;
+    std::string word;
+    
+    std::cout << "Введите какое количество английских слов будет введено: ";
+    std::cin >> n;
+    
+    std::cout << "Введите " << n << " слов: ";
+    for(int i = 0; i < n; i++) {
+        std::cin >> word;
+        v.push_back(word);
+    }
+
 
     std::map<char, int> m;
 
@@ -233,9 +318,9 @@ int main() {
     case 3: task3_7(); break;
     case 4: task4_1(); break;
     case 5: task5_2(); break;
-    case 6: task8_1(); break;
-    case 7: task9_1(); break;
-    case 8: task10_2(); break;
+    case 8: task8_1(); break;
+    case 9: task9_1(); break;
+    case 10: task10_2(); break;
     
     default:
         break;
