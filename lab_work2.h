@@ -7,6 +7,8 @@
 #include <fstream>
 #include <algorithm>
 #include <string>
+#include <cctype>
+#include <functional>
 #include <iterator>
 #include <deque>
 #include <numeric>
