@@ -1,5 +1,4 @@
 #include "lab_work3.h"
-#include <iostream>
 
 
 int main() {

@@ -117,5 +117,7 @@ void task3_3() {
     D.print();
     E.print();
     F.print();
+
+    //City NewwGorod = City::create_city_with_roads();
     
 }

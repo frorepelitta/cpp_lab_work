@@ -18,6 +18,8 @@ public:
     void print();
     void set_new_city(std::string new_city);
     void set_new_road(std::string new_city, int road_distance);
+
+    static City create_city_with_roads();
 };
 
 
