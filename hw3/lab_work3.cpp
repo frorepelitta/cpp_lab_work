@@ -1,40 +1,8 @@
 #include "lab_work3.h"
+#include "human.h"
+#include "name.h"
+#include "city.h"
 
-
-Human::Human(Name names, int height): names(names), height(height){}
-Human::Human(std::string name, int height): name(name), height(height){}
-
-
-
-void Human::get_human_info(){
-    std::cout << name << ", рост: " << height << std::endl;
-}    
-
-void Human::get_human_info_for_task2_2(){
-    std::cout <<"Человек, с именем "<< names.toString() << ", и ростом: " << height << std::endl;
-}    
-
-void Human::print() {
-    std::cout << name << ", рост: " << height << std::endl;
-
-}    
-
-void Human::set_name(std::string name) {
-    this->name = name;
-}
-
-void Human::set_height(int height) {
-    this->height = height;
-}
-
-
-Name::Name(std::string second_name, std::string personal_name, std::string patronymic): 
-    second_name(second_name), personal_name(personal_name), patronymic(patronymic){};
-
-
-void Name::set_second_name(std::string second_name) { this->second_name = second_name; }
-void Name::set_personal_name(std::string personal_name) { this->personal_name = personal_name; }
-void Name::set_patronymic(std::string patronymic) { this->patronymic = patronymic; }
 
 
 bool contains_digits(std::string str) {
@@ -45,6 +13,7 @@ bool contains_digits(std::string str) {
     }
     return false;
 }
+
 
 Name input_create_name() {
     std::string second_name, personal_name, patronymic;
@@ -91,41 +60,6 @@ Human input_create_human() {
     return human;
 }
 
-
-std::string Name::toString(){
-    std::string result = second_name + " " + personal_name + " " + patronymic;
-    return result;
-}
-
-void Name::print() {
-    std::cout << toString() << std::endl;
-}
-
-City::City(std::string name): name(name){}
-City::City(std::string name, const std::map<std::string, int>& road_value_dict): name(name), road_value_dict(road_value_dict){}
-
-
-void City::set_new_city(std::string new_city) {
-    this->name = new_city;
-}
-
-
-void City::set_new_road(std::string new_city, int road_distanse) {
-    road_value_dict[new_city] = road_distanse;
-}
-
-
-void City::print() {
-    std::cout << "Город " << name << " связан с городами:" << std::endl;
-    
-    if(road_value_dict.empty()){
-        std::cout << "У этого города нету маршрутов" << std::endl;
-    } else {
-    for(auto it = road_value_dict.begin(); it != road_value_dict.end(); it++) {
-        std::cout << it->first << " " << it->second << std::endl;
-    }
-    }
-}
 
 
 void task1_2() {

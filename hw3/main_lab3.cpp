@@ -4,6 +4,7 @@
 
 int main() {
     int choose;
+    std::cout << "Номер задания - " << std::endl;
     std::cin >> choose;
     switch (choose) {
         case 1: task1_2(); break;
