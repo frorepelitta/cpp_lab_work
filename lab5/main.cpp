@@ -54,21 +54,26 @@ int main() {
             case 6: {
                 std::string source_file = "source.txt";
                 std::string destination_file = "destination.txt";
-                
-                std::cout << "Содержимое исходного файла:" << std::endl;
-                things.read_text_file(source_file);
+
+                std::ofstream source(source_file);
+                source << "abcd\n";           
+                source << "abcdd\n";           
+                source << "abdcab\n";            
+                source << "saddasd\n";         
+                source << "ab\n";              
+                source << "a\n";     
+                source << "d\n";            
+                source << "asdasdasd\n";         
+                source.close();
                 
                 int m;
                 std::cout << "Введите длину строки для копирования (m): ";
                 std::cin >> m;
                 things.copy_lines_by_length(source_file, destination_file, m);
-                
-                std::cout << "\nСодержимое нового файла:" << std::endl;
-                things.read_text_file(destination_file);
                 break;
             }
                 default: {
-                    std::cout << "Неверный выбор! Попробуйте снова." << std::endl;
+                    std::cout << "Ошибка выбора" << std::endl;
                     break;
             }
         }

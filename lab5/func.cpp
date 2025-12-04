@@ -260,12 +260,10 @@ void work_with_files::copy_lines_by_length(std::string& source_file, std::string
     }
     
     std::string line;
-    int copied_count = 0;
     
     while (std::getline(source, line)) {
         if (line.length() == m) {
             dest << line << std::endl;
-            copied_count++;
             std::cout << "Скопирована строка: " << line << " (длина: " << m << ")" << std::endl;
         }
     }
