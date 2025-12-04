@@ -166,22 +166,34 @@ void work_with_files::fill_text_file_with_random_digits(std::string& filename, i
     std::srand(time(nullptr));
     
     int count = rand()%11 + 5;
-    
-    for(int i = 0; i < count; i++) {
-        int digit = (rand() % 21) - 10;
         
-        if (flag == 0) {
-            file << digit;
-            if (i < count - 1) {
-                file << " ";
+    if (flag == 0) {
+        int num_rows = rand() % 5 + 2;  
+        
+        for (int row = 0; row < num_rows; row++) {
+            int nums_in_row = rand() % 5 + 1;  
+            
+            for (int i = 0; i < nums_in_row; i++) {
+                int digit = (rand() % 11) + 1;  
+
+                file << digit;
+                if (i < nums_in_row - 1) {
+                    file << " "; 
+                }
+                std::cout << digit << " ";
             }
-            std::cout << digit << " ";
-        } else {
+            file << std::endl;  
+            std::cout << std::endl;
+        }
+    } else{
+        int count = rand() % 11 + 5;  
+        
+        for (int i = 0; i < count; i++) {
+            int digit = (rand() % 21) - 10;
             file << digit << std::endl;
             std::cout << digit << std::endl;
         }
     }
-    
     file.close();
 }
 
@@ -235,7 +247,7 @@ double work_with_files::multiply_elements(std::string& filename) {
     double result = 1;
     std::string line;
         
-    if (std::getline(file, line)) {
+    while (std::getline(file, line)) {
         std::istringstream iss(line);
         int number;
         
