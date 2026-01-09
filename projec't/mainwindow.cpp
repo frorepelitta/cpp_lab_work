@@ -8,16 +8,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), model(nullptr)
     db.setUserName("postgres");
     db.setPassword("12345");
     
-    ready = db.open();
-    if (ready) {
-        model = new QSqlTableModel(this, db);
-        model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-        setupUi();
-        
-        QSqlQuery q("SELECT table_name FROM information_schema.tables WHERE table_schema='public'", db);
-        while (q.next()) tables->addItem(q.value(0).toString());
-        if (tables->count()) changeTable();
+    if (!db.open()) {
+        qDebug() << "Ошибка подключения:" << db.lastError().text();
+        return;
     }
+    
+    model = new QSqlTableModel(this, db);
+    model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    setupUi();
+    
+    QSqlQuery q("SELECT table_name FROM information_schema.tables WHERE table_schema='public'", db);
+    while (q.next()) tables->addItem(q.value(0).toString());
+    if (tables->count()) changeTable();
 }
 
 void MainWindow::setupUi()
@@ -29,23 +31,18 @@ void MainWindow::setupUi()
     tables = new QComboBox();
     refreshBtn = new QPushButton("Обновить");
     addBtn = new QPushButton("Добавить");
-    editBtn = new QPushButton("Изменить");
     delBtn = new QPushButton("Удалить");
     
     top->addWidget(tables, 1);
     top->addWidget(refreshBtn);
     top->addWidget(addBtn);
-    top->addWidget(editBtn);
     top->addWidget(delBtn);
     layout->addLayout(top);
     
     view = new QTableView();
     view->setModel(model);
     view->setSelectionBehavior(QAbstractItemView::SelectRows);
-    layout->addWidget(view, 1);
-    
-    status = new QLabel("Готово");
-    layout->addWidget(status);
+    layout->addWidget(view);
     
     setCentralWidget(central);
     resize(900, 600);
@@ -53,7 +50,6 @@ void MainWindow::setupUi()
     connect(tables, &QComboBox::currentTextChanged, this, &MainWindow::changeTable);
     connect(refreshBtn, &QPushButton::clicked, this, &MainWindow::refresh);
     connect(addBtn, &QPushButton::clicked, this, &MainWindow::addRow);
-    connect(editBtn, &QPushButton::clicked, this, &MainWindow::editRow);
     connect(delBtn, &QPushButton::clicked, this, &MainWindow::deleteRow);
 }
 
@@ -65,39 +61,41 @@ void MainWindow::changeTable()
     model->setTable(table);
     model->select();
     view->resizeColumnsToContents();
-    status->setText("Таблица: " + table);
 }
 
 void MainWindow::addRow()
 {
-    if (model->insertRow(model->rowCount())) {
-        QModelIndex index = model->index(model->rowCount() - 1, 0);
-        view->setCurrentIndex(index);
-        view->edit(index);
-    }
-}
-
-void MainWindow::editRow()
-{
-    QModelIndex index = view->currentIndex();
-    if (index.isValid()) {
-        view->edit(index);
-    }
+    // Просто вставляем новую строку
+    int row = model->rowCount();
+    model->insertRow(row);
+    
+    // Переходим к новой строке
+    QModelIndex index = model->index(row, 0);
+    view->setCurrentIndex(index);
+    view->scrollTo(index);
 }
 
 void MainWindow::deleteRow()
 {
     QModelIndex index = view->currentIndex();
-    if (!index.isValid()) return;
-    
-    if (QMessageBox::question(this, "Удалить", "Удалить выбранную строку?") == QMessageBox::Yes) {
+    if (index.isValid()) {
         model->removeRow(index.row());
-        model->submitAll();
     }
 }
 
 void MainWindow::refresh()
 {
+    // Пытаемся сохранить изменения
+    if (!model->submitAll()) {
+        // Показываем простое сообщение об ошибке
+        QMessageBox::warning(this, "Ошибка", 
+            "Не удалось сохранить изменения.\n"
+            "Возможные причины:\n"
+            "1. Не заполнены обязательные поля\n"
+            "2. Нарушение внешних ключей\n"
+            "3. Неверный формат данных");
+    }
+    
+    // В любом случае обновляем таблицу
     model->select();
-    status->setText("Обновлено");
 }

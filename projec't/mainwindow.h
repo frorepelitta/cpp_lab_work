@@ -3,30 +3,27 @@
 
 #include <QApplication>
 #include <QMainWindow>
-#include <QSqlDatabase>
 #include <QSqlTableModel>
-#include <QSqlQuery>
-#include <QSqlError>
 #include <QTableView>
 #include <QComboBox>
 #include <QPushButton>
-#include <QLabel>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QSqlQuery>
+#include <QSqlError>
 #include <QMessageBox>
-#include <QHeaderView>
+#include <QDebug>
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
     MainWindow(QWidget *parent = nullptr);
-    bool isReady() { return ready; }
+    bool isReady() { return db.isOpen(); }
 
 private slots:
     void changeTable();
     void addRow();
-    void editRow();
     void deleteRow();
     void refresh();
 
@@ -37,9 +34,7 @@ private:
     QSqlTableModel *model;
     QComboBox *tables;
     QTableView *view;
-    QPushButton *refreshBtn, *addBtn, *editBtn, *delBtn;
-    QLabel *status;
-    bool ready;
+    QPushButton *addBtn, *delBtn, *refreshBtn;
 };
 
 #endif
