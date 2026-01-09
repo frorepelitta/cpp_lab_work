@@ -1,34 +1,14 @@
 #include "mainwindow.h"
 
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QDoubleValidator>
-#include <QFormLayout>
-#include <QHBoxLayout>
-#include <QHeaderView>
-#include <QIntValidator>
-#include <QLineEdit>
-#include <QMessageBox>
-#include <QSqlError>
-#include <QSqlField>
-#include <QSqlQuery>
-#include <QSqlRecord>
-#include <QVBoxLayout>
-#include <QVector>
-#include <QWidget>
-#include <QAbstractItemView>
-
-// Заполните данными удалённой БД.
-static const QString DB_HOST = QStringLiteral("your-host");
-static const int DB_PORT = 5432;
-static const QString DB_NAME = QStringLiteral("your-db");
-static const QString DB_USER = QStringLiteral("your-user");
-static const QString DB_PASS = QStringLiteral("your-password");
-
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), model(new QSqlTableModel(this))
+    : QMainWindow(parent), model(nullptr)
 {
     ready = setupDb();
+    if (ready) {
+        // Создаем модель после установки соединения с БД
+        model = new QSqlTableModel(this, db);
+        model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    }
     setupUi();
     if (ready) {
         loadTables();
@@ -38,11 +18,11 @@ MainWindow::MainWindow(QWidget *parent)
 bool MainWindow::setupDb()
 {
     db = QSqlDatabase::addDatabase(QStringLiteral("QPSQL"));
-    db.setHostName(DB_HOST);
-    db.setPort(DB_PORT);
-    db.setDatabaseName(DB_NAME);
-    db.setUserName(DB_USER);
-    db.setPassword(DB_PASS);
+    db.setHostName("127.0.0.1");
+    db.setPort(5432);
+    db.setDatabaseName("kafe_sql");
+    db.setUserName("postgres");
+    db.setPassword("12345");
 
     if (!db.open()) {
         QMessageBox::critical(this, tr("Ошибка подключения"),
@@ -50,6 +30,7 @@ bool MainWindow::setupDb()
                                   .arg(db.lastError().text()));
         return false;
     }
+
     return true;
 }
 
@@ -85,7 +66,10 @@ void MainWindow::setupUi()
     setCentralWidget(central);
     resize(900, 600);
 
-    model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    // Модель уже настроена в конструкторе
+    if (model) {
+        // Дополнительные настройки модели, если нужно
+    }
 
     connect(tables, &QComboBox::currentTextChanged, this, &MainWindow::changeTable);
     connect(addBtn, &QPushButton::clicked, this, &MainWindow::addRow);
@@ -99,25 +83,37 @@ void MainWindow::loadTables()
     tables->clear();
     QSqlQuery q(db);
     if (!q.exec(QStringLiteral("SELECT table_name FROM information_schema.tables "
-                               "WHERE table_schema='public' ORDER BY table_name"))) {
+                               "WHERE table_schema='public' AND table_type='BASE TABLE' "
+                               "ORDER BY table_name"))) {
         showError(q.lastError().text());
         return;
     }
     while (q.next()) {
-        tables->addItem(q.value(0).toString());
+        QString tableName = q.value(0).toString();
+        if (!tableName.isEmpty()) {
+            tables->addItem(tableName);
+        }
     }
-    if (tables->count()) {
+    if (tables->count() > 0) {
+        // Временно отключаем сигнал, чтобы избежать вызова changeTable с неправильным значением
+        tables->blockSignals(true);
         tables->setCurrentIndex(0);
+        tables->blockSignals(false);
+        // Вызываем changeTable вручную для первой таблицы
+        changeTable(tables->currentText());
     }
 }
 
 void MainWindow::changeTable(const QString &table)
 {
-    if (table.isEmpty())
+    if (table.isEmpty() || table == tr("Таблица")) {
         return;
+    }
+
     model->setTable(table);
     if (!model->select()) {
-        showError(model->lastError().text());
+        showError(tr("Ошибка загрузки таблицы '%1':\n%2")
+                      .arg(table, model->lastError().text()));
         return;
     }
     view->resizeColumnsToContents();
@@ -136,10 +132,10 @@ bool MainWindow::editRecord(QSqlRecord &rec, const QString &title)
     for (int i = 0; i < rec.count(); ++i) {
         auto *edit = new QLineEdit(&dlg);
         edit->setText(rec.value(i).toString());
-        const auto type = rec.field(i).type();
-        if (type == QVariant::Int || type == QVariant::LongLong) {
+        const auto metaType = rec.field(i).metaType();
+        if (metaType.id() == QMetaType::Int || metaType.id() == QMetaType::LongLong) {
             edit->setValidator(new QIntValidator(edit));
-        } else if (type == QVariant::Double || type == QVariant::Float) {
+        } else if (metaType.id() == QMetaType::Double || metaType.id() == QMetaType::Float) {
             edit->setValidator(new QDoubleValidator(edit));
         }
         form->addRow(rec.fieldName(i) + ":", edit);
@@ -170,7 +166,7 @@ bool MainWindow::editRecord(QSqlRecord &rec, const QString &title)
 
 void MainWindow::addRow()
 {
-    if (!model->table().size())
+    if (model->tableName().isEmpty())
         return;
     QSqlRecord rec = model->record();
     if (!editRecord(rec, tr("Добавить запись")))
@@ -221,7 +217,7 @@ void MainWindow::deleteRow()
 
 void MainWindow::refresh()
 {
-    if (!model->table().isEmpty()) {
+    if (!model->tableName().isEmpty()) {
         model->select();
         status->setText(tr("Обновлено"));
     }

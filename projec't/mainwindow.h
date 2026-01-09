@@ -2,14 +2,39 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QMainWindow>
+
+// Виджеты и layout'ы
 #include <QComboBox>
 #include <QLabel>
-#include <QMainWindow>
 #include <QPushButton>
-#include <QSqlDatabase>
-#include <QSqlRecord>
-#include <QSqlTableModel>
 #include <QTableView>
+#include <QWidget>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QFormLayout>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QHeaderView>
+#include <QAbstractItemView>
+#include <QLineEdit>
+
+// Валидация и вспомогательные типы
+#include <QIntValidator>
+#include <QDoubleValidator>
+#include <QMetaType>
+#include <QVector>
+
+// Сообщения и ошибки
+#include <QMessageBox>
+
+// Работа с БД
+#include <QSqlDatabase>
+#include <QSqlTableModel>
+#include <QSqlRecord>
+#include <QSqlField>
+#include <QSqlQuery>
+#include <QSqlError>
 
 class MainWindow : public QMainWindow
 {
