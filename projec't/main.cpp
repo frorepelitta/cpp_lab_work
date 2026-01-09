@@ -1,6 +1,5 @@
 // Простое клиент-серверное Qt-приложение для CRUD с PostgreSQL.
 #include "mainwindow.h"
-#include <QApplication>
 
 int main(int argc, char *argv[])
 {
