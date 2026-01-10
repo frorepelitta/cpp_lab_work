@@ -65,9 +65,30 @@ void MainWindow::changeTable()
 
 void MainWindow::addRow()
 {
-    // Просто вставляем новую строку
+    // Вставляем новую строку
     int row = model->rowCount();
     model->insertRow(row);
+    
+    QString tableName = tables->currentText();
+    
+    if (tableName == "zakazy") {
+        // Получаем текущее время в американском формате
+        QString currentTime = QDateTime::currentDateTime().toString("M/d/yy h:mm AP");
+        model->setData(model->index(row, 0), currentTime);
+    }
+    else if (tableName == "sostav_zakaza") {
+        // Получаем последнее время заказа для удобства
+        QSqlQuery query(db);
+        query.exec("SELECT vremya_zakaza FROM zakazy ORDER BY vremya_zakaza DESC LIMIT 1");
+        if (query.next()) {
+            QString lastOrderTime = query.value(0).toString();
+            model->setData(model->index(row, 0), lastOrderTime);
+        }
+        // Устанавливаем количество по умолчанию
+        if (model->columnCount() > 2) {
+            model->setData(model->index(row, 2), 1);
+        }
+    }
     
     // Переходим к новой строке
     QModelIndex index = model->index(row, 0);
