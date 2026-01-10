@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QSqlTableModel>
+#include <QSqlQueryModel>
 #include <QTableView>
 #include <QComboBox>
 #include <QPushButton>
@@ -14,6 +15,8 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QDateTime>
+#include <QDialog>
+#include <QTextEdit>
 
 class MainWindow : public QMainWindow
 {
@@ -27,6 +30,8 @@ private slots:
     void addRow();
     void deleteRow();
     void refresh();
+    void showStockReport();     // Отчет по остаткам на складе
+    void showPopularReport();   // Отчет по популярным блюдам
 
 private:
     void setupUi();
