@@ -1,5 +1,4 @@
 #include "table_controller.h"
-#include <QDebug>
 
 TableController::TableController(QObject* parent) : 
     QObject(parent), model(nullptr), view(nullptr), 

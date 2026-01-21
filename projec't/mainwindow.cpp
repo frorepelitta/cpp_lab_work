@@ -1,27 +1,20 @@
 #include "mainwindow.h"
-#include <QSqlQuery>
-#include <QDebug>
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
-    // Подключаемся к базе данных
     dbManager.connect();
     
-    // Только если подключение успешно
     if (dbManager.isConnected()) {
         QSqlDatabase& db = dbManager.getDatabase();
         
-        // Создаем модель
         QSqlTableModel* model = new QSqlTableModel(this, db);
         model->setEditStrategy(QSqlTableModel::OnManualSubmit);
         
-        // Настраиваем контроллер
         controller.setModel(model);
         controller.setDatabase(db);
         
         setupUi();
         
-        // Загружаем список таблиц
         QSqlQuery q("SELECT table_name FROM information_schema.tables WHERE table_schema='public'", db);
         while (q.next()) tables->addItem(q.value(0).toString());
         
@@ -29,7 +22,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
             changeTable();
         }
     } else {
-        // Если нет подключения, все равно создаем UI (для отладки)
         setupUi();
         QMessageBox::warning(this, "Ошибка", "Не удалось подключиться к базе данных");
     }

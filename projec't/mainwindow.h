@@ -11,7 +11,8 @@
 #include <QHBoxLayout>
 #include <QMessageBox>
 #include <QApplication>
-#include <QSqlQuery>    
+#include <QSqlQuery>   
+#include <QDebug> 
 
 class MainWindow : public QMainWindow
 {

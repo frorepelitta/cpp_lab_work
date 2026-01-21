@@ -17,23 +17,19 @@ class TableController : public QObject
 public:
     explicit TableController(QObject* parent = nullptr);
     
-    // Установка компонентов
     void setModel(QSqlTableModel* model);
     void setView(QTableView* view);
     void setTablesCombo(QComboBox* combo);
     void setDatabase(QSqlDatabase& db);
     
-    // Основные операции с таблицей
     void changeTable(const QString& tableName);
     void addRow(const QString& currentTable);
     void deleteRow();
     void refresh();
     
-    // Методы для получения данных (без UI)
     QString getStockReportData();
     QString getPopularReportData();
     
-    // Геттер для модели
     QSqlTableModel* getModel() const { return model; }
     
 private:
