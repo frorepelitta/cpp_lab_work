@@ -1,46 +1,42 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QApplication>
+#include "database_manager.h"
+#include "table_controller.h"
 #include <QMainWindow>
-#include <QSqlTableModel>
-#include <QSqlQueryModel>
-#include <QTableView>
 #include <QComboBox>
+#include <QTableView>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QSqlQuery>
-#include <QSqlError>
 #include <QMessageBox>
-#include <QDebug>
-#include <QDateTime>
-#include <QDialog>
-#include <QTextEdit>
+#include <QApplication>
+#include <QSqlQuery>    
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    MainWindow(QWidget *parent = nullptr);
-    bool isReady() { return db.isOpen(); }
+    MainWindow(QWidget* parent = nullptr);
+    bool isReady() const { return dbManager.isConnected(); }
 
 private slots:
     void changeTable();
     void addRow();
     void deleteRow();
     void refresh();
-    void showStockReport();     // Отчет по остаткам на складе
-    void showPopularReport();   // Отчет по популярным блюдам
+    void showStockReport();
+    void showPopularReport();
 
 private:
     void setupUi();
     
-    QSqlDatabase db;
-    QSqlTableModel *model;
-    QComboBox *tables;
-    QTableView *view;
-    QPushButton *addBtn, *delBtn, *refreshBtn;
+    DatabaseManager dbManager;
+    TableController controller;
+    
+    QComboBox* tables;
+    QTableView* view;
+    QPushButton *addBtn, *delBtn, *refreshBtn, *stockBtn, *popularBtn;
 };
 
 #endif

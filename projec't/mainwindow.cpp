@@ -1,35 +1,48 @@
 #include "mainwindow.h"
+#include <QSqlQuery>
+#include <QDebug>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), model(nullptr)
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
-    db = QSqlDatabase::addDatabase("QPSQL");
-    db.setHostName("127.0.0.1");
-    db.setDatabaseName("kafe_sql");
-    db.setUserName("postgres");
-    db.setPassword("12345");
-
-    if (!db.open()) {
-        qDebug() << "Ошибка подключения:" << db.lastError().text();
-        return;
+    // Подключаемся к базе данных
+    dbManager.connect();
+    
+    // Только если подключение успешно
+    if (dbManager.isConnected()) {
+        QSqlDatabase& db = dbManager.getDatabase();
+        
+        // Создаем модель
+        QSqlTableModel* model = new QSqlTableModel(this, db);
+        model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+        
+        // Настраиваем контроллер
+        controller.setModel(model);
+        controller.setDatabase(db);
+        
+        setupUi();
+        
+        // Загружаем список таблиц
+        QSqlQuery q("SELECT table_name FROM information_schema.tables WHERE table_schema='public'", db);
+        while (q.next()) tables->addItem(q.value(0).toString());
+        
+        if (tables->count()) {
+            changeTable();
+        }
+    } else {
+        // Если нет подключения, все равно создаем UI (для отладки)
+        setupUi();
+        QMessageBox::warning(this, "Ошибка", "Не удалось подключиться к базе данных");
     }
-    
-    model = new QSqlTableModel(this, db);
-    model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    setupUi();
-    
-    QSqlQuery q("SELECT table_name FROM information_schema.tables WHERE table_schema='public'", db);
-    while (q.next()) tables->addItem(q.value(0).toString());
-    if (tables->count()) changeTable();
 }
 
 void MainWindow::setupUi()
 {
-    QWidget *central = new QWidget(this);
+    QWidget* central = new QWidget(this);
     setCentralWidget(central);
     
-    QVBoxLayout *layout = new QVBoxLayout(central);
+    QVBoxLayout* layout = new QVBoxLayout(central);
     
-    QHBoxLayout *top = new QHBoxLayout();
+    QHBoxLayout* top = new QHBoxLayout();
     tables = new QComboBox();
     refreshBtn = new QPushButton("Обновить");
     addBtn = new QPushButton("Добавить");
@@ -41,17 +54,19 @@ void MainWindow::setupUi()
     top->addWidget(delBtn);
     layout->addLayout(top);
     
-    QHBoxLayout *reportLayout = new QHBoxLayout();
-    QPushButton *stockBtn = new QPushButton("Склад");
-    QPushButton *popularBtn = new QPushButton("Популярные");
+    QHBoxLayout* reportLayout = new QHBoxLayout();
+    stockBtn = new QPushButton("Склад");
+    popularBtn = new QPushButton("Популярные");
     
     reportLayout->addWidget(stockBtn);
     reportLayout->addWidget(popularBtn);
     layout->addLayout(reportLayout);
     
     view = new QTableView();
-    view->setModel(model);
     view->setSelectionBehavior(QAbstractItemView::SelectRows);
+    controller.setView(view);
+    controller.setTablesCombo(tables);
+    
     layout->addWidget(view);
     
     resize(900, 600);
@@ -66,80 +81,32 @@ void MainWindow::setupUi()
 
 void MainWindow::changeTable()
 {
-    QString table = tables->currentText();
-    if (table.isEmpty()) return;
-    
-    model->setTable(table);
-    model->select();
-    view->resizeColumnsToContents();
+    controller.changeTable(tables->currentText());
 }
 
 void MainWindow::addRow()
 {
-    int row = model->rowCount();
-    model->insertRow(row);
-    
-    QString tableName = tables->currentText();
-    
-    if (tableName == "zakazy") {
-        model->setData(model->index(row, 0), QDateTime::currentDateTime().toString("M/d/yy h:mm AP"));
-    }
-    else if (tableName == "sostav_zakaza") {
-        QSqlQuery q(db);
-        q.exec("SELECT vremya_zakaza FROM zakazy ORDER BY vremya_zakaza DESC LIMIT 1");
-        if (q.next()) model->setData(model->index(row, 0), q.value(0).toString());
-        if (model->columnCount() > 2) model->setData(model->index(row, 2), 1);
-    }
-    
-    view->setCurrentIndex(model->index(row, 0));
-    view->scrollTo(model->index(row, 0));
+    controller.addRow(tables->currentText());
 }
 
 void MainWindow::deleteRow()
 {
-    QModelIndex index = view->currentIndex();
-    if (index.isValid()) model->removeRow(index.row());
+    controller.deleteRow();
 }
 
 void MainWindow::refresh()
 {
-    if (!model->submitAll()) {
-        QMessageBox::warning(this, "Ошибка", "Не удалось сохранить изменения");
-    }
-    model->select();
+    controller.refresh();
 }
 
-// Отчет 1: Остатки на складе
 void MainWindow::showStockReport()
 {
-    QSqlQuery q(db);
-    q.exec("SELECT nazvanie_ingredienta, ostatok, mera_izmereniya FROM sklad");
-    
-    QString report;
-    while (q.next()) {
-        report += q.value(0).toString() + ": " + 
-                 q.value(1).toString() + " " + 
-                 q.value(2).toString() + "\n";
-    }
-    
+    QString report = controller.getStockReportData();
     QMessageBox::information(this, "Склад", report);
 }
 
-// Отчет 2: Популярные блюда (упрощенный)
 void MainWindow::showPopularReport()
 {
-    QSqlQuery q(db);
-    q.exec("SELECT pm.nazvanie_pozitsii, SUM(sz.kolichestvo) "
-           "FROM sostav_zakaza sz "
-           "JOIN pozitsii_menyu pm ON sz.nazvanie_pozitsii = pm.nazvanie_pozitsii "
-           "GROUP BY pm.nazvanie_pozitsii ORDER BY SUM(sz.kolichestvo) DESC");
-    
-    QString report;
-    int i = 1;
-    while (q.next()) {
-        report += QString("%1. %2: %3\n").arg(i).arg(q.value(0).toString()).arg(q.value(1).toInt());
-        i++;
-    }
-    
+    QString report = controller.getPopularReportData();
     QMessageBox::information(this, "Популярные блюда", report);
 }
